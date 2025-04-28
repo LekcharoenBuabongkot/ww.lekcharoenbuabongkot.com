@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+  <title>รายการสินค้า | เล็กเจริญบัวบงกช</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* สไตล์ตะกร้าสินค้า */
+    .cart-icon {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ff4aba;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .cart-popup {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      width: 300px;
+      display: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .cart-popup h3 {
+      margin-top: 0;
+    }
+    .cart-popup ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .cart-popup ul li {
+      margin-bottom: 10px;
+    }
+    .cart-popup button {
+      background-color: #ff4aba;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-group">
+      <img src="11.jpg" alt="โลโก้บริษัท" class="logo">
+      <img src="otop4star.png" alt="โลโก้ OTOP 4 ดาว" class="otop-logo">
+    </div>
+    <h1>รายการสินค้า</h1>
+    <a href="index.html">← กลับหน้าหลัก</a>
+  </header>
+
+  <main>
+    <section class="products">
+      <!-- สินค้า 01-10 -->
+      <div class="product">
+        <img src="210.png" alt="ยาหม่องขี้ผึ้งขาวเกสรดอกบัว 210 กรัม">
+        <h3>ยาหม่องขี้ผึ้งขาวเกสรดอกบัว ตราบัวบงกช 210 กรัม</h3>
+        <p>200 บาท</p>
+        <button class="add-to-cart" data-name="ยาหม่อง 210 กรัม" data-price="200">หยิบใส่ตะกร้า</button>
+      </div>
+      <div class="product">
+        <img src="120.png" alt="ยาหม่องขี้ผึ้งขาวเกสรดอกบัว 120 กรัม">
+        <h3>ยาหม่องขี้ผึ้งขาวเกสรดอกบัว ตราบัวบงกช 120 กรัม</h3>
+        <p>130 บาท</p>
+        <button class="add-to-cart" data-name="ยาหม่อง 120 กรัม" data-price="130">หยิบใส่ตะกร้า</button>
+      </div>
+      <div class="product">
+        <img src="50.png" alt="ยาหม่องขี้ผึ้งขาวเกสรดอกบัว 50 กรัม">
+        <h3>ยาหม่องขี้ผึ้งขาวเกสรดอกบัว ตราบัวบงกช 50 กรัม</h3>
+        <p>80 บาท</p>
+        <button class="add-to-cart" data-name="ยาหม่อง 50 กรัม" data-price="80">หยิบใส่ตะกร้า</button>
+      </div>
+      <!-- เพิ่มสินค้าอื่น ๆ ตามรูปแบบนี้ -->
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 บริษัท เล็กเจริญบัวบงกช จำกัด</p>
+  </footer>
+
+  <!-- ตะกร้าสินค้าและป๊อปอัพ -->
+  <button class="cart-icon" onclick="toggleCart()">🛒</button>
+
+  <div class="cart-popup">
+    <h3>รายการสินค้าในตะกร้า</h3>
+    <ul id="cart-items">
+      <!-- รายการสินค้าในตะกร้าจะแสดงที่นี่ -->
+    </ul>
+    <button onclick="checkout()">สรุปส่งไป LINE</button>
+  </div>
+
+  <script>
+    const cart = [];
+
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+      button.addEventListener('click', () => {
+        const productName = button.getAttribute('data-name');
+        const productPrice = button.getAttribute('data-price');
+        
+        cart.push({ name: productName, price: parseInt(productPrice) });
+        Swal.fire({
+          icon: 'success',
+          title: 'สินค้าถูกเพิ่มในตะกร้า',
+          text: `${productName} ราคา ${productPrice} บาท`,
+        });
+        updateCart();
+      });
+    });
+
+    function updateCart() {
+      const cartItemsContainer = document.getElementById('cart-items');
+      cartItemsContainer.innerHTML = ''; // ลบรายการเก่า
+
+      cart.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${item.name} - ${item.price} บาท`;
+        cartItemsContainer.appendChild(listItem);
+      });
+    }
+
+    function toggleCart() {
+      const cartPopup = document.querySelector('.cart-popup');
+      cartPopup.style.display = (cartPopup.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function checkout() {
+      if (cart.length === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'ไม่มีสินค้าในตะกร้า',
+          text: 'กรุณาเลือกสินค้าก่อน',
+        });
+        return;
+      }
+
+      let cartText = 'สินค้าที่คุณเลือก:\n';
+      let totalPrice = 0;
+
+      cart.forEach(item => {
+        cartText += `${item.name} - ${item.price} บาท\n`;
+        totalPrice += item.price;
+      });
+
+      const total = `รวม: ${totalPrice} บาท`;
+
+      Swal.fire({
+        title: 'กรุณากรอกข้อมูลของคุณ',
+        html: `
+          <label for="name">ชื่อ:</label>
+          <input type="text" id="name" placeholder="กรุณากรอกชื่อ" class="swal2-input">
+          <label for="phone">เบอร์โทร:</label>
+          <input type="text" id="phone" placeholder="กรุณากรอกเบอร์โทร" class="swal2-input">
+        `,
+        confirmButtonText: 'ส่งไป LINE',
+        preConfirm: () => {
+          const name = document.getElementById('name').value;
+          const phone = document.getElementById('phone').value;
+
+          if (!name || !phone) {
+            Swal.showValidationMessage('กรุณากรอกชื่อและเบอร์โทร');
+            return false;
+          }
+
+          const message = `
+            สินค้าที่เลือก:
+            ${cartText}
+            ${total}
+
+            ชื่อ: ${name}
+            เบอร์โทร: ${phone}
+          `;
+
+          // ส่งไป LINE
+          const lineLink = `https://line.me/ti/p/YYleJBZpsP?text=${encodeURIComponent(message)}`;
+          window.open(lineLink, '_blank');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

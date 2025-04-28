@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ตะกร้าสินค้า | ชำระเงิน</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>ตะกร้าสินค้า</h1>
+    <a href="product.html">← กลับหน้าสินค้า</a>
+  </header>
+
+  <main>
+    <section class="cart-list"></section>
+    <div class="total"></div>
+
+    <section class="checkout-form">
+      <h2>ข้อมูลผู้สั่งซื้อ</h2>
+      <form id="orderForm">
+        <label>ชื่อ-นามสกุล: <input type="text" name="name" required></label><br>
+        <label>ที่อยู่จัดส่ง: <textarea name="address" required></textarea></label><br>
+        <label>เบอร์โทรศัพท์: <input type="tel" name="phone" required></label><br>
+        <label>ช่องทางติดต่อ (เช่น LINE, Facebook): <input type="text" name="contact"></label><br>
+        <button type="submit">ยืนยันคำสั่งซื้อ</button>
+      </form>
+      <div id="order-result"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 บริษัท เล็กเจริญบัวบงกช จำกัด</p>
+  </footer>
+
+  <script>
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const list = document.querySelector('.cart-list');
+    const totalDiv = document.querySelector('.total');
+    const orderForm = document.getElementById('orderForm');
+    const orderResult = document.getElementById('order-result');
+
+    if (cart.length === 0) {
+      list.innerHTML = '<p>ยังไม่มีสินค้าในตะกร้า</p>';
+    } else {
+      let total = 0;
+      list.innerHTML = '<ul>' + cart.map(item => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        return `<li>${item.name} × ${item.qty} = ${subtotal} บาท</li>`;
+      }).join('') + '</ul>';
+
+      totalDiv.innerHTML = `<h3>รวมทั้งหมด: ${total} บาท</h3>`;
+    }
+
+    orderForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const data = new FormData(orderForm);
+  const customer = {
+    name: data.get('name'),
+    address: data.get('address'),
+    phone: data.get('phone'),
+    contact: data.get('contact')
+  };
+
+  const summary = cart.map(item =>
+    `${item.name} × ${item.qty} = ${item.price * item.qty} บาท`
+  ).join('\n');
+
+  const totalText = totalDiv.textContent.replace('รวมทั้งหมด: ', '').replace(' บาท', '');
+
+  // กำหนด Entry ID ให้ตรงกับฟอร์มคุณ
+  const formURL = "https://docs.google.com/forms/d/e/FORM_ID/formResponse"; // เปลี่ยน FORM_ID ให้ตรง
+  const formData = new URLSearchParams();
+  formData.append("entry.12345678", customer.name);       // ใส่ Entry ID ของช่องชื่อ
+  formData.append("entry.23456789", customer.address);    // ช่องที่อยู่
+  formData.append("entry.34567890", customer.phone);      // ช่องโทรศัพท์
+  formData.append("entry.45678901", customer.contact);    // ช่องช่องทางติดต่อ
+  formData.append("entry.56789012", summary);             // ช่องสรุปรายการสินค้า
+  formData.append("entry.67890123", totalText);           // ช่องรวมราคา
+
+  fetch(formURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: formData
+  })
+  .then(() => {
+    orderResult.innerHTML = `
+      <p><strong>คำสั่งซื้อของคุณถูกส่งเรียบร้อยแล้ว!</strong></p>
+      <p>สามารถคัดลอกข้อความนี้ไปส่งทาง LINE หรือ Facebook ได้:</p>
+      <textarea readonly style="width:100%;height:150px;">คุณ ${customer.name} สั่งสินค้า:\n\n${summary}\n\nรวมทั้งหมด: ${totalText} บาท\n\nที่อยู่จัดส่ง:\n${customer.address}\n\nโทร: ${customer.phone}\nติดต่อ: ${customer.contact}</textarea>
+    `;
+    localStorage.removeItem('cart');
+  })
+  .catch(err => {
+    alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่');
+    console.error(err);
+  });
+});

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+  <title>เล็กเจริญบัวบงกช จำกัด</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="11.jpg" alt="โลโก้บริษัท เล็กเจริญบัวบงกช" class="logo">
+    <h1>บริษัท เล็กเจริญบัวบงกช จำกัด</h1>
+    <p>สมุนไพรเพื่อสุขภาพ จากธรรมชาติแท้ 💚</p>
+  </header>
+
+  <main>
+    <section class="products" id="product-list">
+      <!-- สินค้าจะแสดงที่นี่จาก JS -->
+    </section>
+
+    <section class="cart">
+      <h2>🛒 ตะกร้าสินค้า</h2>
+      <ul id="cart-items"></ul>
+      <p id="total">รวมทั้งหมด: ฿0</p>
+      <button onclick="checkout()">ดำเนินการชำระเงิน</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 บริษัท เล็กเจริญบัวบงกช จำกัด</p>
+  </footer>
+
+<script>
+const cart = [];
+
+function renderProducts() {
+  const list = document.getElementById('product-list');
+  products.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'product';
+    div.innerHTML = `
+      <img src="https://via.placeholder.com/250x150?text=${encodeURIComponent(p.name)}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>฿${p.price}</p>
+      <button onclick="addToCart(${p.id})">เพิ่มลงตะกร้า</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function addToCart(id) {
+  const product = products.find(p => p.id === id);
+  cart.push(product);
+  renderCart();
+}
+
+function renderCart() {
+  const list = document.getElementById('cart-items');
+  list.innerHTML = '';
+  let total = 0;
+  cart.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = `${item.name} - ฿${item.price}`;
+    list.appendChild(li);
+    total += item.price;
+  });
+  document.getElementById('total').textContent = `รวมทั้งหมด: ฿${total}`;
+}
+
+function checkout() {
+  if (cart.length === 0) {
+    alert("ยังไม่มีสินค้าในตะกร้า");
+    return;
+  }
+  let message = "ขอบคุณที่สั่งซื้อ!\n\nรายการที่สั่ง:\n";
+  cart.forEach(item => {
+    message += `- ${item.name} ราคา ฿${item.price}\n`;
+  });
+  let total = cart.reduce((sum, item) => sum + item.price, 0);
+  message += `\nรวมทั้งหมด: ฿${total}`;
+
+  alert(message);
+  cart.length = 0;
+  renderCart();
+}
+
+renderProducts();
+</script>
+</body>
+</html>
+<section style="text-align: center; padding: 1rem;">
+  <a href="products.html" class="button-link">
+    <button>📦 ดูรายการสินค้า</button>
+  </a>
+</section>
